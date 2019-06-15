@@ -19,5 +19,7 @@ class HTTPLayerHelper {
         if !query.isEmpty {
             query.removeLast() // to remove redundant '&'
         }
+        
+        return query
     }
 }

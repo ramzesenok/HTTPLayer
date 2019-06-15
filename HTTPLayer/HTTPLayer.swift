@@ -6,13 +6,29 @@
 //  Copyright © 2019 Roman Mirzoyan. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 class HTTPLayer {
     static let shared = HTTPLayer()
     
     private let inalidURLError = NSError(domain: "httplayer.error", code: 400, userInfo: ["message" : "URL is invalid"])
     private let nilResponseDataError = NSError(domain: "httplayer.error", code: 400, userInfo: ["message" : "Data appears to be nil"])
+    private let unableToParseImageError = NSError(domain: "httplayer.error", code: 400, userInfo: ["message" : "Unable to parse data into image"])
+    
+    func getImage(from url: String, completion: @escaping((Result<UIImage, Error>) -> ())) {
+        HTTPLayer.shared.get(url: url) { (result: Result<Data, Error>) in
+            switch result {
+            case .success(let data):
+                if let image = UIImage(data: data) {
+                    completion(.success(image))
+                } else {
+                    completion(.failure(self.unableToParseImageError))
+                }
+            case .failure(let err):
+                completion(.failure(err))
+            }
+        }
+    }
     
     func get<T: Decodable>(url: String, queryParams: [String: Any] = [:], completion: @escaping((Result<T, Error>) -> ())) {
         HTTPLayer.shared.get(url: url, queryParams: queryParams) { (result: Result<Data, Error>) in
