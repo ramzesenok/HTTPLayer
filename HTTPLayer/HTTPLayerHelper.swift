@@ -22,4 +22,8 @@ class HTTPLayerHelper {
         
         return query
     }
+    
+    static func getError(with message: String) -> NSError {
+        return NSError(domain: "httplayer.error", code: 400, userInfo: ["message" : message])
+    }
 }

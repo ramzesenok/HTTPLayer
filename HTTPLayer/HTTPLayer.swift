@@ -11,10 +11,6 @@ import UIKit
 class HTTPLayer {
     static let shared = HTTPLayer()
     
-    private let inalidURLError = NSError(domain: "httplayer.error", code: 400, userInfo: ["message" : "URL is invalid"])
-    private let nilResponseDataError = NSError(domain: "httplayer.error", code: 400, userInfo: ["message" : "Data appears to be nil"])
-    private let unableToParseImageError = NSError(domain: "httplayer.error", code: 400, userInfo: ["message" : "Unable to parse data into image"])
-    
     func getImage(from url: String, completion: @escaping((Result<UIImage, Error>) -> ())) {
         HTTPLayer.shared.get(url: url) { (result: Result<Data, Error>) in
             switch result {
@@ -22,7 +18,7 @@ class HTTPLayer {
                 if let image = UIImage(data: data) {
                     completion(.success(image))
                 } else {
-                    completion(.failure(self.unableToParseImageError))
+                    completion(.failure(HTTPLayerError.unableToParseImageError.error))
                 }
             case .failure(let err):
                 completion(.failure(err))
@@ -55,7 +51,7 @@ class HTTPLayer {
     
     func get(url: String, queryParams: [String: Any] = [:], completion: @escaping((Result<Data, Error>) -> ())) {
         guard var urlComponents = URLComponents(string: url) else {
-            completion(.failure(inalidURLError))
+            completion(.failure(HTTPLayerError.inalidURLError.error))
             
             return
         }
@@ -63,7 +59,7 @@ class HTTPLayer {
         urlComponents.query = HTTPLayerHelper.generateQuery(from: queryParams)
         
         guard let finalUrl = urlComponents.url else {
-            completion(.failure(inalidURLError))
+            completion(.failure(HTTPLayerError.inalidURLError.error))
             
             return
         }
@@ -80,7 +76,7 @@ class HTTPLayer {
             if let contents = data {
                 completion(.success(contents))
             } else {
-                completion(.failure(self.nilResponseDataError))
+                completion(.failure(HTTPLayerError.nilResponseDataError.error))
             }
         }
         
