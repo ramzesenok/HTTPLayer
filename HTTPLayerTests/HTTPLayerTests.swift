@@ -12,23 +12,37 @@ import XCTest
 class HTTPLayerTests: XCTestCase {
 
     override func setUp() {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        
     }
 
     override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        
     }
 
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
-
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
+    func testImageDownloadingAndAssigning() {
+        var image = UIImage()
+        let imageView = UIImageView()
+        
+        let imageExpectation = XCTestExpectation(description: "Rates have been loaded")
+        let imageViewExpectation = XCTestExpectation(description: "Rates have been loaded")
+        
+        HTTPLayer.shared.getImage(from: "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png") { (result) in
+            switch result {
+            case .success(let img):
+                image = img
+            case .failure(_):
+                break
+            }
+            
+            imageExpectation.fulfill()
         }
+        
+        imageView.setImage(from: "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png") {
+            imageViewExpectation.fulfill()
+        }
+        
+        wait(for: [imageExpectation, imageViewExpectation], timeout: 5)
+        
+        XCTAssert(imageView.image?.pngData() == image.pngData())
     }
-
 }
