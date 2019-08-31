@@ -9,7 +9,7 @@
 import Foundation
 
 enum HTTPLayerError: String {
-    case inalidURLError = "URL is invalid"
+    case invalidURLError = "URL is invalid"
     case nilResponseDataError = "Data appears to be nil"
     case unableToParseImageError = "Unable to parse data into image"
     

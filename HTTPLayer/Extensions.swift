@@ -13,9 +13,7 @@ extension UIImageView {
         HTTPLayer.shared.getImage(from: source) { (result: Result<UIImage, Error>) in
             switch result {
             case .success(let image):
-                DispatchQueue.main.async {
-                    self.image = image
-                }
+                self.image = image
             case .failure(_):
                 break
             }
