@@ -28,8 +28,8 @@ class HTTPLayer {
     }
     
     @discardableResult
-    func get<T: Decodable>(url: String, queryParams: [String: Any] = [:], completion: @escaping((Result<T, Error>) -> ())) -> URLSessionDataTask? {
-        return HTTPLayer.shared.get(url: url, queryParams: queryParams) { (result: Result<Data, Error>) in
+    func get<T: Decodable>(url: String, queryParams: [String: Any] = [:], headers: [String: String] = [:], completion: @escaping((Result<T, Error>) -> ())) -> URLSessionDataTask? {
+        return HTTPLayer.shared.get(url: url, queryParams: queryParams, headers: headers) { (result: Result<Data, Error>) in
             switch result {
             case .success(let data):
                 do {
@@ -51,7 +51,7 @@ class HTTPLayer {
         }
     }
     
-    func get(url: String, queryParams: [String: Any] = [:], completion: @escaping((Result<Data, Error>) -> ())) -> URLSessionDataTask? {
+    func get(url: String, queryParams: [String: Any] = [:], headers: [String: String] = [:], completion: @escaping((Result<Data, Error>) -> ())) -> URLSessionDataTask? {
         let completionBlock: (Result<Data, Error>) -> () = { data in
             DispatchQueue.main.async {
                 completion(data)
@@ -72,7 +72,15 @@ class HTTPLayer {
             return nil
         }
         
-        let task = URLSession.shared.dataTask(with: finalUrl) { (data, response, error) in
+        var request = URLRequest(url: finalUrl)
+        
+        headers.forEach { (arg) in
+            let (key, value) = arg
+            
+            request.addValue(value, forHTTPHeaderField: key)
+        }
+        
+        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             print("\nGET \(finalUrl)\n")
             
             guard error == nil else {
