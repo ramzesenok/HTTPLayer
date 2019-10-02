@@ -9,7 +9,7 @@
 import Foundation
 
 class HTTPLayerHelper {
-    static func generateQuery(from params: [String: Any]) -> String {
+    static func generateQuery(from params: [String: Any]) -> String? {
         var query = ""
         
         params.forEach({ (arg: (key: String, value: Any)) in
@@ -20,7 +20,7 @@ class HTTPLayerHelper {
             query.removeLast() // to remove redundant '&'
         }
         
-        return query
+        return query != "" ? query : nil
     }
     
     static func getError(with message: String) -> NSError {
