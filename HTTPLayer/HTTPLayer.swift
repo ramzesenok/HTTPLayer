@@ -99,10 +99,23 @@ class HTTPLayer {
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             print("\n\(method.value) \(finalUrl)\n")
             
-            guard error == nil else {
-                completionBlock(.failure(error!))
+            if let error = error {
+                completionBlock(.failure(error))
                 
                 return
+            }
+            
+            if let response = response as? HTTPURLResponse {
+                switch response.statusCode {
+                case 400..<500:
+                    completionBlock(.failure(HTTPLayerError.clientError.error))
+                    return
+                case 500..<600:
+                    completionBlock(.failure(HTTPLayerError.internalServerError.error))
+                    return
+                default:
+                    break
+                }
             }
             
             if let contents = data {
